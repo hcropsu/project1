@@ -33,7 +33,9 @@
             <input type="submit" name="clear_filter" value="Clear filter">
         </form>
         <ul>
+            {% comment %}
             <!-- USE THIS VERSION WHEN THE 'entry_list' view in 'views.py' IS FIXED -->
+            <!-- BE SURE TO REMOVE THE DJANGO TAGS INDICATING A COMMENT AS WELL -->
             <!--
             {% for entry in entries %}
             <li>
@@ -42,8 +44,11 @@
             </li>
             {% endfor %}
             -->
+            {% endcomment %}
 
             <!-- THIS VERSION SORT OF WORKS WITH THE UNSAFE RAW SQL QUERY IN 'views.py' -->
+            <!-- TO FIX COMMENT THE BELOW FOR-LOOP OUT, OR DELETE THE WHOLE LOOP -->
+            <!-- IF YOU CHOSE TO COMMENT OUT, MAKE SURE TO USE DJANGO COMMENT TAGS -->
             {% for entry in entries %}
             <li>
                 <b>{{ entry.0}}:</b> {{ entry.1 }} - {{ entry.2 }} <br>
