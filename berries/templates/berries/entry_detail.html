@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Details</title>
+</head>
+<body>
+    <h1>Here are details about this batch of berries</h1>
+    <h2>Foraged by: {{ entry.user.username }}</h2>
+    <h2>Type of berry:</h2>
+    <p>{{ entry.berry_type }}</p>
+    <h2>Amount foraged:</h2>
+    <p>{{ entry.amount_foraged }}</p>
+    <h2>Location</h2>
+    <p>{{ entry.location }}</p>
+    <h2>Comments:</h2>
+    {% for comment in comments %}
+    <!--
+    Cross-Site Scripting (XSS):
+    Django has automatic escaping for rendered templates to prevent XSS.
+    To disable this feature in order to demonstrate XSS and allowing '<script>' tags
+    to work in the comments the 'safe' filter is used here. To fix this you can just
+    remove the '| safe' part from {{ comment.text | safe }}
+    -->
+    <p>{{ comment.user }} comments: {{ comment.text | safe}}
+        {% if request.user == comment.user %}
+        <a href="{% url 'berries:delete_comment' entry.id comment.id %}">Delete</a>
+        {% endif %}
+    </p>
+    {% endfor %}
+    <h2>Add new comment:</h2>
+    <form method="POST" action="{% url 'berries:new_comment' entry.id %}">
+        {% csrf_token %}
+        <label for="new_comment">Add comment:</label><br>
+        <textarea name="new_comment" id="new_comment" cols="30" rows="10"></textarea><br>
+        <button type="submit">Submit</button>
+    </form>
+    
+</body>
+</html>

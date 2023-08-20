@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berries</title>
+</head>
+<body>
+    <h1>Berries</h1>
+    {% if user.is_authenticated %}
+        <p>Welcome, {{ user.username }}!</p>
+        <form method="POST" action="{% url 'berries:entry_list' %}">
+            {% csrf_token %}
+            <fieldset>
+                <legend><h1>Add new berries</h1></legend>
+                <label for="berry_type">Berry type:</label><br>
+                <input type="text" id="berry_type" name="berry_type" value=""><br>
+                <label for="amount_foraged">Amount:</label><br>
+                <input type="text" id="amount_foraged" name="amount_foraged" value=""><br>
+                <label for="location">Location:</label><br>
+                <input type="text" id="location" name="location" value=""><br>
+                <input type="submit" name="add_entry" value="Add">
+            </fieldset>
+        </form>
+        <br>
+        <h1>Here are all the berries foraged by all users:</h1>
+        <p>You can also filter the list using berry type as filter</p>
+        <form method="POST" action="{% url 'berries:entry_list' %}">
+            {% csrf_token %}
+            <label for="filter">Berry type</label><br>
+            <input type="text" id="filter" name="filter" value="">
+            <input type="submit" name="berry_filter" value="Filter">
+            <input type="submit" name="clear_filter" value="Clear filter">
+        </form>
+        <ul>
+            <!-- USE THIS VERSION WHEN THE 'entry_list' view in 'views.py' IS FIXED -->
+            <!--
+            {% for entry in entries %}
+            <li>
+                <b>{{ entry.user.username}}:</b> {{ entry.berry_type }} - {{ entry.amount_foraged }} <br>
+                <a href="{% url 'berries:entry_detail' entry_id=entry.id %}">View details</a>
+            </li>
+            {% endfor %}
+            -->
+
+            <!-- THIS VERSION SORT OF WORKS WITH THE UNSAFE RAW SQL QUERY IN 'views.py' -->
+            {% for entry in entries %}
+            <li>
+                <b>{{ entry.0}}:</b> {{ entry.1 }} - {{ entry.2 }} <br>
+                <a href="#">View details</a>
+            </li>
+            {% endfor %}
+        </ul>
+        <br>
+        <form method="POST" action="{% url 'berries:sign_out' %}">
+            {% csrf_token %}
+            <input type="submit" name="sign_out" value="Logout">
+        </form>
+    {% else %}
+    <p>Please login to add and view entries.</p>
+    <form method="post" action="{% url 'berries:sign_in' %}">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Login</legend>
+            {% if error_msg %} <p>{{error_msg}}</p> {% endif %}
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username">
+            <br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password">
+            <br>
+            <button type="submit">Login</button>
+        </fieldset>
+    </form>
+    {% endif %}
+</body>
+</html>
