@@ -52,7 +52,7 @@ def entry_list(request):
 # This view needs to have the '@login_required' decorator so to fix this, just uncomment it.
 # Otherwise a non-logged in user can just type for example 'http://127.0.0.1:8000/berries/entry/3/' in
 # the browser and see details that should be for valid logged in users only.
-@login_required(login_url='/berries/')
+#@login_required(login_url='/berries/')
 def entry_detail(request, entry_id):
     entry = BerryEntry.objects.get(id=entry_id)
     comments = Comment.objects.filter(entry=entry)

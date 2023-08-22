@@ -31,17 +31,25 @@ The HTML file corresponding to `/berries` is rendered differently once a user is
 
 ## FLAW 1: Security Misconfiguration
 
-The project’s superuser was created using a very bad combination of username and password, ‘admin:admin’, despite Django’s prompts about weak credentials. If any attacker wishes to try and gain access to the admin page this combination of username and password would probably be one of the first ones to try. Gaining access to admin rights compromises the whole application so this is a major issue.
+The project’s superuser was created using a very bad combination of username and password, `admin:admin`, despite Django’s prompts about weak credentials. If any attacker wishes to try and gain access to the admin page this combination of username and password would probably be one of the first ones to try. Gaining access to admin rights compromises the whole application so this is a major issue.
 
-Fixing can be done in a terminal via the `manage.py` file and `changepassword` argument. Type `python3 manage.py changepassword <username>` to start the process. In this particular case in place of ‘<username>’ you would of course write `admin`. You can also change the password via the browser in the admin page.
+Fixing can be done in a terminal via the `manage.py` file and `changepassword` argument. Type `python3 manage.py changepassword <username>` to start the process. In this particular case in place of `<username>` you would of course write `admin`. You can also change the password via the browser in the admin page.
 
 ## FLAW 2: Broken Access Control
+
+Flaw and fix: https://github.com/hcropsu/project1/blob/main/berries/views.py#L51
 
 The base URL leads to a welcome page that is rendered differently depending on whether a user is logged in or not. From this page you cannot do much if you don’t log in. However, there is a flaw where you can access the detail view page of a berry entry just by manually altering the URL in the browser. For example, typing `127.0.0.1:8000/berries/entry/1` in the address bar will land you on the detail page even if you are not logged in. This is a flaw that leads to unauthorized information disclosure as these details are meant for valid users only.
 
 The fix for this is quite simple thanks to the Django framework. You need to use a decorator for the appropriate view in `views.py`. The appropriate decorator `@login_required()` is already in place in the code but is commented out. It is set to redirect to the “main” page i.e `127.0.0.1.:8000/berries` because that’s where the login form is. So just by uncommenting that line, the problem is now fixed. You could also use a different approach by checking if the `request.user.is_authenticated` and then act accordingly, but the decorator is cleaner [1].
 
 ## FLAW 3: Injection
+
+Flaw: https://github.com/hcropsu/project1/blob/main/berries/views.py#L31
+
+Fix: https://github.com/hcropsu/project1/blob/main/berries/views.py#L25 
+related HTML file that also needs to be fixed for correct rendering: https://github.com/hcropsu/project1/blob/main/berries/templates/berries/entry_list.html#L37 
+
 
 When a user is logged in, the root page shows an unordered list of all entries posted by users. There is a possibility to filter that list based on the `berry_type` property. This is now implemented in a very unsafe way where the value from the form field is placed directly without any sanitation to a raw SQL query which filters the list. This allows an attacker to inject SQL into the query and compromise the application.
 
@@ -51,11 +59,15 @@ To fix such an obvious way to inject SQL directly into a query it is best to use
 
 ## FLAW 4: Cross-Site Scripting (XSS)
 
+Flaw and fix: https://github.com/hcropsu/project1/blob/main/berries/templates/berries/entry_detail.html#L20
+
 Relating to the previous fault, due to built-in security measures in Django the demonstration of this fault requires purposefully bypassing the protection. In the `entry_detail.html` there is a feature that allows users to add comments to entries. Comments are database objects and have a property called `text`. In the `entry_detail.html` the value of the `comment.text` attribute is tagged as `safe` which means it bypasses Django’s own HTML escaping system. This makes it possible to include working `<script>` tags in the comment and makes the application vulnerable to XSS where an attacker could for example steal cookies and gain access to a valid user’s session.
 
 Like mentioned the fix for this is very easy. Simply remove the `safe` tag from the template’s context variable to enable Django’s automatic HTML escaping again. [3]
 
 ## FLAW 5: Broken Authentication
+
+Flaw and fix : https://github.com/hcropsu/project1/blob/main/foraging_app/settings.py#L43
 
 From my app’s flaws this is the most ambiguous. The session timeout is defined in `settings.py` to equal to roughly 30 days in seconds. According to OWASP this can be considered a security flaw, since if a valid user forgets to explicitly log out of the app on a (public) computer, an attacker using the same computer later now has access to the user’s authenticated session. In my app’s case there isn’t any real sensitive information used or stored but this is still a privacy concern at the very least and in some other app this might be a more serious flaw. I see the session time out mainly as a UX vs security case. Not forcing the user to log in every time they use the app can lead to a more pleasant UX on expanse of security. I would however argue that there should be some sort of a prompt or setting where the user can decide if they want to remain logged in or not and they should be informed about the risks of staying logged in.
 
