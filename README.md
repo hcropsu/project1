@@ -1,6 +1,6 @@
 # Cyber Security Base 2023 - Project I
 
-This is a demonstration of a vulnerable Django web application called `berries`. The server runs by default at `127.0.0.1:8000` and the app can be found at `127.0.0.1:8000/berries`. The admin page is `127.0.0.1:8000/admin`.
+This is a demonstration of a vulnerable Django web application called `berries`. The server runs by default at `127.0.0.1:8000` and the app can be found at `127.0.0.1:8000/berries`. The admin page is `127.0.0.1:8000/admin`. If you want to test the app in practice `python3 manage.py runserver` starts the server.
 
 ## Project overview
 
